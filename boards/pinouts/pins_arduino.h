@@ -58,4 +58,6 @@
 #include "m5stack-paper.h"
 #elif ARDUINO_NESSO_N1
 #include "arduino-nesso-n1.h"
+#elif XTEINK_X4
+#include "xteink-x4.h"
 #endif

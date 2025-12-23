@@ -45,7 +45,7 @@ out_bin = proj_dir / f"Launcher-{pioenv}.bin"
 
 # Esptool from PlatformIO + Python executable
 esptool_pkg = senv.PioPlatform().get_package_dir("tool-esptoolpy")
-esptool_py = str(Path(esptool_pkg) / "esptool")
+esptool_mod = str(Path(esptool_pkg))
 python_exe = senv.get("PYTHONEXE", "python")
 
 chip_arg = mcu if mcu else "esp32"
@@ -113,10 +113,14 @@ def _merge_bins_callback(target, source, env):
 
     # Initialize cmd_parts as a list
     cmd_parts = [
-        "pio pkg exec -p \"tool-esptoolpy\" -- esptool",
-        "--chip", chip_arg,
+        q(python_exe),
+        "-m",
+        "esptool",
+        "--chip",
+        chip_arg,
         "merge-bin",
-        "--output", q(out_bin),
+        "--output",
+        q(out_bin),
     ]
 
     if mcu=="esp32p4":
@@ -155,6 +159,16 @@ def _merge_bins_callback(target, source, env):
 
     if rc != 0:
         print(f"[merge_bin] Failed with exit code {rc}")
+        try:
+            stdout = result.stdout.decode("utf-8", errors="replace")
+            stderr = result.stderr.decode("utf-8", errors="replace")
+        except Exception:
+            stdout = ""
+            stderr = ""
+        if stdout:
+            print(stdout)
+        if stderr:
+            print(stderr)
         # env.Exit(rc)
     else:
         try:

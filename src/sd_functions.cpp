@@ -75,9 +75,21 @@ bool setupSdCard() {
 #endif
 
 #else
+  #if defined(XTEINK_X4)
+    pinMode(SDCARD_CS, OUTPUT);
+    digitalWrite(SDCARD_CS, HIGH);
+  #ifdef BOARD_SPI_CS
+    pinMode(BOARD_SPI_CS, OUTPUT);
+    digitalWrite(BOARD_SPI_CS, HIGH);
+  #endif
+    SPI.begin(SDCARD_SCK, SDCARD_MISO, SDCARD_MOSI, -1);
+    delay(10);
+    if (!SDM.begin(SDCARD_CS, SPI, 10000000 /*10 MHz*/))
+  #else
     sdcardSPI.begin(SDCARD_SCK, SDCARD_MISO, SDCARD_MOSI, SDCARD_CS); // start SPI communications
     vTaskDelay(pdTICKS_TO_MS(10));
     if (!SDM.begin(SDCARD_CS, sdcardSPI))
+  #endif
 #endif
     {
         // sdcardSPI.end(); // Closes SPI connections and release pin header.

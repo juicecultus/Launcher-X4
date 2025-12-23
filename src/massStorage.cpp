@@ -1,4 +1,4 @@
-#ifdef ARDUINO_USB_MODE
+#if defined(ARDUINO_USB_MODE) && !defined(XTEINK_X4)
 
 #include "massStorage.h"
 #include "display.h"

@@ -27,13 +27,26 @@ private:
 };
 #elif defined(GxEPD2_DISPLAY)
 #include <GxEPD2_BW.h>
+#include <SPI.h>
 // #include <Fonts/FreeMonoBold9pt7b.h>
+#ifndef BOARD_SPI_CS
 #define BOARD_SPI_CS 34
+#endif
+#ifndef BOARD_SPI_DC
 #define BOARD_SPI_DC 35
+#endif
+#ifndef BOARD_SPI_RST
 #define BOARD_SPI_RST -1
+#endif
+#ifndef BOARD_SPI_BUSY
 #define BOARD_SPI_BUSY 37
+#endif
+#ifndef BOARD_SPI_SCK
 #define BOARD_SPI_SCK 36
+#endif
+#ifndef BOARD_SPI_MOSI
 #define BOARD_SPI_MOSI 33
+#endif
 
 #define DARKGREY 0x8888
 #define BLACK GxEPD_WHITE
@@ -43,16 +56,25 @@ private:
 #define DARKCYAN 0x6666
 #define LIGHTGREY 0x4444
 
-class Ard_eSPI : public GxEPD2_BW<GxEPD2_310_GDEQ031T10, GxEPD2_310_GDEQ031T10::HEIGHT> {
+#if defined(XTEINK_X4)
+using GxEpdPanel = GxEPD2_426_GDEQ0426T82;
+#else
+using GxEpdPanel = GxEPD2_310_GDEQ031T10;
+#endif
+
+class Ard_eSPI : public GxEPD2_BW<GxEpdPanel, GxEpdPanel::HEIGHT> {
 public:
     Ard_eSPI()
-        : GxEPD2_BW<GxEPD2_310_GDEQ031T10, GxEPD2_310_GDEQ031T10::HEIGHT>(
-              GxEPD2_310_GDEQ031T10(BOARD_SPI_CS, BOARD_SPI_DC, BOARD_SPI_RST, BOARD_SPI_BUSY)
+        : GxEPD2_BW<GxEpdPanel, GxEpdPanel::HEIGHT>(
+              GxEpdPanel(BOARD_SPI_CS, BOARD_SPI_DC, BOARD_SPI_RST, BOARD_SPI_BUSY)
           ) {}
     void begin() {
-        init(
-            115200, true, 2, false
-        ); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
+#ifdef GXEPD_SPI_FQ
+        SPISettings spi_settings(GXEPD_SPI_FQ, MSBFIRST, SPI_MODE0);
+        init(115200, true, 2, false, SPI, spi_settings);
+#else
+        init(115200, true, 2, false);
+#endif
         setFullWindow();
     }
     inline void drawChar2(int16_t x, int16_t y, char c, int16_t a, int16_t b) {

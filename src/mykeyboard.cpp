@@ -3,6 +3,7 @@
 #include "powerSave.h"
 #include "settings.h"
 #include <globals.h>
+#include <cstring>
 
 int max_FM_size = tftWidth / (LW * FM) - 1;
 int max_FP_size = tftWidth / (LW)-2;
@@ -276,17 +277,27 @@ String generalKeyboard(
 #define PAD 2
 #define KBLH (6 + LH * FM) // Keyboard Buttons Line Height
     // { x coord of btn border, btn width, x coord of the inside text }
-    // 12 px = 10 px + 2 of padding between the letters -> refer to the section above to better understand
-    // ((12px * n_letters) - 2px ) + 9*2px = width
-    const int btns_layout[5][3] = {
-        {1 * PAD + 0 * LW * FM,  3 * LW * FM, 1 * PAD + 0 * LW * FM + LW * FM / 2 }, // OK
-        {2 * PAD + 3 * LW * FM,  3 * LW * FM, 2 * PAD + 3 * LW * FM + LW * FM / 2 }, // ab (Caps)
-        {3 * PAD + 6 * LW * FM,  3 * LW * FM, 3 * PAD + 6 * LW * FM + LW * FM / 2 }, // <- (DEL)
-        {4 * PAD + 9 * LW * FM,  4 * LW * FM, 4 * PAD + 9 * LW * FM + LW * FM / 2 }, // [_] (SPACE)
-        {5 * PAD + 13 * LW * FM, 4 * LW * FM, 5 * PAD + 13 * LW * FM + LW * FM / 2}, // Esc
-    };
+    int btns_layout[5][3];
+    {
+        const char *buttons_strings[] = {"OK", "A@", "<-", "[_]", "Esc"};
+        const int inner_w = (int)tftWidth - (PAD * (buttons_number + 1));
+        const int base_w = inner_w / buttons_number;
+        const int extra = inner_w - (base_w * buttons_number);
 
-    const int key_width = tftWidth / KeyboardWidth;
+        int x_cursor = PAD;
+        for (int i = 0; i < buttons_number; ++i) {
+            const int w = base_w + (i < extra ? 1 : 0);
+            btns_layout[i][0] = x_cursor;
+            btns_layout[i][1] = w;
+            btns_layout[i][2] = x_cursor + (w / 2);
+
+            x_cursor += w + PAD;
+        }
+    }
+
+    const int grid_pad_x = 10;
+    const int key_width = (tftWidth - 2 * grid_pad_x) / KeyboardWidth;
+    const int grid_margin_x = grid_pad_x;
     const int key_height = (tftHeight - (2 * KBLH + LH * FM)) / KeyboardHeight;
     // characters are px high and 10px wide
     const int text_offset_x = key_width / 2 - LW * FM / 2;
@@ -306,7 +317,7 @@ String generalKeyboard(
             box_list[k].key = keys[j][i][0];
             box_list[k].key_sh = keys[j][i][1];
             box_list[k].color = ~BGCOLOR;
-            box_list[k].x = i * key_width;
+            box_list[k].x = grid_margin_x + i * key_width;
             box_list[k].y = j * key_height + 2 * KBLH + LH * FM;
             box_list[k].w = key_width;
             box_list[k].h = key_height;
@@ -366,7 +377,7 @@ String generalKeyboard(
                         btns_layout[0][0], 2, btns_layout[0][1], KBLH, getComplementaryColor(BGCOLOR)
                     );
                 } else tft->setTextColor(getComplementaryColor(BGCOLOR), BGCOLOR);
-                tft->drawString("OK", btns_layout[0][2], 5);
+                tft->drawCentreString("OK", btns_layout[0][2], 5, 1);
                 // CAP
                 if (x == 1 && y == -1) {
                     tft->setTextColor(BGCOLOR, getComplementaryColor(BGCOLOR));
@@ -376,10 +387,10 @@ String generalKeyboard(
                 } else if (caps) {
                     tft->fillRect(btns_layout[1][0], 2, btns_layout[1][1], KBLH, DARKGREY);
                     tft->setTextColor(getComplementaryColor(BGCOLOR), DARKGREY);
-                    tft->drawString("ab", btns_layout[1][2], 5);
+                    tft->drawCentreString("ab", btns_layout[1][2], 5, 1);
                 } else {
                     tft->setTextColor(getComplementaryColor(BGCOLOR), BGCOLOR);
-                    tft->drawString("A@", btns_layout[1][2], 5);
+                    tft->drawCentreString("A@", btns_layout[1][2], 5, 1);
                 }
 
                 // DEL
@@ -389,7 +400,7 @@ String generalKeyboard(
                         btns_layout[2][0], 2, btns_layout[2][1], KBLH, getComplementaryColor(BGCOLOR)
                     );
                 } else tft->setTextColor(getComplementaryColor(BGCOLOR), BGCOLOR);
-                tft->drawString("<-", btns_layout[2][2], 5);
+                tft->drawCentreString("<-", btns_layout[2][2], 5, 1);
                 // SPACE
                 if (x == 3 && y == -1) {
                     tft->setTextColor(BGCOLOR, getComplementaryColor(BGCOLOR));
@@ -397,7 +408,7 @@ String generalKeyboard(
                         btns_layout[3][0], 2, btns_layout[3][1], KBLH, getComplementaryColor(BGCOLOR)
                     );
                 } else tft->setTextColor(getComplementaryColor(BGCOLOR), BGCOLOR);
-                tft->drawString("[_]", btns_layout[3][2], 5);
+                tft->drawCentreString("[_]", btns_layout[3][2], 5, 1);
                 //   BACK
                 if (x > 3 && y == -1) {
                     tft->setTextColor(BGCOLOR, getComplementaryColor(BGCOLOR));
@@ -405,7 +416,7 @@ String generalKeyboard(
                         btns_layout[4][0], 2, btns_layout[4][1], KBLH, getComplementaryColor(BGCOLOR)
                     );
                 } else tft->setTextColor(getComplementaryColor(BGCOLOR), BGCOLOR);
-                tft->drawString("Esc", btns_layout[4][2], 5);
+                tft->drawCentreString("Esc", btns_layout[4][2], 5, 1);
             }
 
             // Prints the chars counter
@@ -425,10 +436,7 @@ String generalKeyboard(
             );
             // Drawing the textbox and the currently typed string
             tft->setTextSize(FM);
-            // reset the text box if needed
-            if (current_text.length() == (max_FM_size) || current_text.length() == (max_FM_size + 1) ||
-                current_text.length() == (max_FP_size) || current_text.length() == (max_FP_size + 1))
-                tft->fillRect(3, KBLH + LH * FP + 4, tftWidth - 3, KBLH, BGCOLOR);
+            tft->fillRect(3, KBLH + LH * FP + 4, tftWidth - 3, KBLH, BGCOLOR);
             // typed string border
             tft->drawRect(3, KBLH + LH * FP + 4, tftWidth - 3, KBLH, FGCOLOR);
             // write the text
@@ -454,7 +462,7 @@ String generalKeyboard(
             for (int i = 0; i < KeyboardHeight; i++) {
                 for (int j = 0; j < KeyboardWidth; j++) {
                     // key coordinates
-                    int key_x = j * key_width;
+                    int key_x = grid_margin_x + j * key_width;
                     int key_y = i * key_height + KBLH * 2 + LH * FP + 6;
 
                     // Use the previous coordinates to redraw only the previous letter
@@ -469,22 +477,14 @@ String generalKeyboard(
                     }
 
                     // Print the letters
-                    if (!caps)
-                        tft->drawChar2(
-                            key_x + text_offset_x,
-                            key_y + 2 + text_offset_y,
-                            keys[i][j][0],
-                            x == j && y == i ? BGCOLOR : FGCOLOR,
-                            x == j && y == i ? ~BGCOLOR : BGCOLOR
-                        );
-                    else
-                        tft->drawChar2(
-                            key_x + text_offset_x,
-                            key_y + 2 + text_offset_y,
-                            keys[i][j][1],
-                            x == j && y == i ? BGCOLOR : FGCOLOR,
-                            x == j && y == i ? ~BGCOLOR : BGCOLOR
-                        );
+                    {
+                        const bool selected = (x == j && y == i);
+                        const char c = !caps ? keys[i][j][0] : keys[i][j][1];
+                        const uint16_t fg = selected ? BGCOLOR : FGCOLOR;
+                        const uint16_t bg = selected ? ~BGCOLOR : BGCOLOR;
+                        tft->setTextColor(fg, bg);
+                        tft->drawCentreString(String(c), key_x + key_width / 2, key_y + 2 + text_offset_y, 1);
+                    }
 
                     // Return colors to normal to print the other letters
                     if (x == j && y == i) { tft->setTextColor(~BGCOLOR, BGCOLOR); }
