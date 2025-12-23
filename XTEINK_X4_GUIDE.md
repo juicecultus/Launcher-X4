@@ -120,3 +120,6 @@ python3 -m esptool --chip esp32c3 --port /dev/cu.usbmodem1101 --baud 921600 \
 - If flashing fails at `921600`, retry with `460800` or `115200`.
 - After flashing, the device may re-enumerate and your serial port name may change.
 - If you only flash the app (`0x10000`), partition-table related issues will not be fixed.
+
+
+IMPORTANT, when Launcher splash shows press OK on your Xteink X4to enter the main menu. 
