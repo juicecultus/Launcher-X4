@@ -252,6 +252,10 @@
       needs: [compile_sketch]
       if: github.ref_type == 'tag'
       steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - id: launcher_version
         name: Get Version
         run: |
@@ -276,6 +280,7 @@
         with:
           name: Launcher Release ${{ steps.launcher_version.outputs.version }}
           tag_name: ${{ steps.launcher_version.outputs.version }}
-          generate_release_notes: true
+          generate_release_notes: false
+          body_path: Release_guide.md
           files: |
             Launcher-*.bin
