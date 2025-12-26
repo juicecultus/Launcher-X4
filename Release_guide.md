@@ -1,4 +1,4 @@
-# Launcher Port X4 — Release Guide
+# Launcher X4 — Release Guide
 
 This guide covers installing the Launcher build on your Xteink X4. Choose the path that matches your setup.
 

@@ -25,6 +25,8 @@
 
       steps:
           - uses: actions/checkout@v4
+            with:
+              repository: juicecultus/Launcher-X4
 
           - id: build
             name: setup Python
@@ -69,6 +71,7 @@
       steps:
         - uses: actions/checkout@v4
           with:
+            repository: juicecultus/Launcher-X4
             ref: WebPage
             fetch-depth: 1
 

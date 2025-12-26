@@ -1,4 +1,4 @@
-# Xteink X4 (ESP32-C3, 16MB) — Launcher-Port-X4 How-To
+# Xteink X4 (ESP32-C3, 16MB) — Launcher-X4 How-To
 
 This repository is a fork/port of the original Launcher project with added support for the **Xteink X4**.
 
