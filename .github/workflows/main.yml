@@ -72,7 +72,8 @@
         - uses: actions/checkout@v4
           with:
             repository: juicecultus/Launcher-X4
-            ref: WebPage
+            # WebPage branch no longer exists; use default branch for post steps.
+            ref: main
             fetch-depth: 1
 
         - name: Download all artifacts
